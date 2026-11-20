@@ -1,0 +1,42 @@
+name: Pytest
+
+# Advanced feature: run tests only when they are relevant, and never twice for the same change.
+on:
+  push:
+    branches: [main]            # test what lands on main
+    paths:                      # ...only if code, tests or this workflow changed
+      - "04_cinema_tickets/**/*.py"
+      - "04_cinema_tickets/requirements.txt"
+      - ".github/workflows/pytest.yml"
+  pull_request:                 # test feature branches via PR (not on every branch push)
+    branches: [main]
+    paths:
+      - "04_cinema_tickets/**/*.py"
+      - "04_cinema_tickets/requirements.txt"
+      - ".github/workflows/pytest.yml"
+  workflow_dispatch:            # manual run from the Actions tab
+
+# Cancel an older in-progress run when a newer push/PR update arrives for the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: 04_cinema_tickets
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: 04_cinema_tickets/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: pytest -v
