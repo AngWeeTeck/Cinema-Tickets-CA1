@@ -14,7 +14,7 @@ on:
       - ".github/workflows/pytest.yml"
   workflow_dispatch:            # manual run from the Actions tab
 
-# Cancel an older in-progress run when a newer push/PR update arrives for the same ref.
+# Cancel an older in-progress run when a newer push/PR update arrives for the same ref.(abc)
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
